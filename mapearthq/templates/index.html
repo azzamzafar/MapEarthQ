@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -5,8 +7,8 @@
         <meta charset="utf-8">
     </head>
     <body>
-      <p style="text-align: center;margin-top:10px;"> Epicentre Locations </p>
-      <iframe srcdoc="{{ world_map }}" style="height:80vh;width:96vw;margin-left:20px;margin-right:20px;"title="Epicentre Coordinates"></iframe>
+      
+      <iframe srcdoc="{{ world_map }}" style="height:60vh;width:94vw;margin-left:20px;margin-right:20px;"title="Epicentre Coordinates"></iframe>
      
       
         <table class="table table-hover">
@@ -22,18 +24,30 @@
               </tr>
             </thead>
             <tbody>
-                {% for listing in listings %}
+                {% for listing in listings  %}
+                
                 <tr>
-                    <td>{{listing.id}}</td>          
+                    <td></td>          
                     <td>{{listing.Mag}}</td>
                     <td>{{listing.lat}}</td>
                     <td>{{listing.lon}}</td>
                     <td>{{listing.country}}</td>
                     <td>{{listing.time}}</td>
                 </tr>
+                
                 {% endfor %}
               
             </tbody>
           </table>
+          <script >
+            var table = document.getElementsByTagName('table')[0],
+            rows = table.getElementsByTagName('tr'),
+            text = 'textContent' in document ? 'textContent' : 'innerText';
+
+            for (var i = 0, len = rows.length; i < len; i++) {
+              rows[i].children[0][text] = i ;
+            }
+    </script>
     </body>
 </html>
+{% endblock %}
