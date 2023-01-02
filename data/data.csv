@@ -96,4 +96,3 @@ time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,
 2022-12-26T20:02:24.580Z,-2.0231,128.2345,32.313,4.5,mb,28,114,2.909,0.89,us,us6000jbv4,2022-12-27T16:58:47.040Z,"164 km NNW of Amahai, Indonesia",earthquake,9.41,3.954,0.124,19,reviewed,us,us
 2022-12-26T16:27:13.762Z,14.3684,39.8057,9.151,4.6,mb,22,61,4.092,0.41,us,us6000jbtc,2022-12-26T16:48:54.040Z,"38 km ENE of ?d?grat, Ethiopia",earthquake,9.14,4.215,0.146,16,reviewed,us,us
 2022-12-26T15:10:52.329Z,-65.351,-179.6032,10,4.7,mb,22,124,13.209,0.41,us,us6000jbt6,2022-12-26T15:46:04.040Z,"Pacific-Antarctic Ridge",earthquake,8.83,1.909,0.134,21,reviewed,us,us
-2022-12-26T12:21:07.616Z,14.4882,40.0148,10,5.5,mww,78,50,4.032,0.46,us,us6000jbsk,2022-12-28T22:09:48.453Z,"64 km ENE of ?d?grat, Ethiopia",earthquake,3.66,1.874,0.065,23,reviewed,us,us

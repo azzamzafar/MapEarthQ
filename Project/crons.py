@@ -20,7 +20,7 @@ class GetWeekly(CronJobBase):
     #         return (days*12 + seconds//3600)
 
     def save_csv(self):
-        listings = WorldData.objects.order_by('-Mag')[:10]
+        listings = WorldData.objects.order_by('-time')[:30]
         
         dict_list = [{'Magnitude':list.Mag,'latitude':list.lat,
         'longitude':list.lon,'country':list.country,'time':list.time} for list in listings]
@@ -49,7 +49,7 @@ class GetWeekly(CronJobBase):
         df = pd.read_csv('data/data.csv').dropna(
             subset=['place']).sort_values(
                 'mag',ascending=False).reset_index(
-                    drop=True).head(10)
+                    drop=True).head(30)
         obj_row = []
         WorldData.objects.all().delete()
         for i in range(len(df)):
@@ -58,7 +58,6 @@ class GetWeekly(CronJobBase):
             mag = df.iloc[i]['mag']
             time = df.iloc[i]['time']
             if country:=self.name_country(lat,lon):
-                print(country)
                 obj_row.append(WorldData(
                     Mag=mag,
                     lat=lat,
@@ -67,7 +66,6 @@ class GetWeekly(CronJobBase):
                     time = time
                 ))
             else:
-                print(df.iloc[i]['place'])
                 obj_row.append(WorldData(
                     Mag=mag,
                     lat=lat,
@@ -80,7 +78,7 @@ class GetWeekly(CronJobBase):
     def do(self, *args, **options):
         # if self.hour_elapsed()>24:
         end=datetime.now()
-        start = end-timedelta(days=7)
+        start = end-timedelta(days=6)
 
         data = requests.get(f'https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime={start}&endtime={end}&minmagnitude=4.5')
         #filepath = 'MapEarthQ/data.csv'
