@@ -8,9 +8,7 @@ from mapearthq.models import WorldData,WeeklyCsvFile
 # print(listings[0].country)
 
 def index(request):
-    qs = WorldData.objects.order_by('-time').distinct()[:10]
-    listings = sorted(qs,key=lambda o:o.Mag)
-    listings.reverse()
+    listings = WorldData.objects.order_by('-Mag')[:10]
     weekly_data = WeeklyCsvFile.objects.last()
     m = folium.Map(location=[listings[0].lat,listings[0].lon],zoom_start=2)
     for listing in listings:
