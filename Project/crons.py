@@ -1,25 +1,41 @@
 from django_cron import CronJobBase, Schedule
+from django.conf import settings
+from django.core.files.base import ContentFile
 import requests
 from datetime import date,datetime, timedelta,timezone
+from os.path import join
 import pandas as pd
 from geopy.geocoders import Nominatim
 #import classes from models
-from mapearthq.models import WorldData
-
+from mapearthq.models import WorldData,WeeklyCsvFile
 
 class GetWeekly(CronJobBase):
     schedule = Schedule(run_every_mins=720)
     code = "cron.GetWeekly"
-    
-    def do(self, *args, **options):
-        
-        # def hour_elapsed(self):
-        #     latest_query = WorldData.objects.last()
-        #     days = (datetime.now(timezone.utc) - latest_query.time).days
-        #     seconds = (datetime.now(timezone.utc) - latest_query.time).seconds
-        #     return (days*12 + seconds//3600)
 
-        def name_country(lat,lon):
+    def hour_elapsed(self):
+            latest_query = WorldData.objects.last()
+            days = (datetime.now(timezone.utc) - latest_query.time).days
+            seconds = (datetime.now(timezone.utc) - latest_query.time).seconds
+            return (days*12 + seconds//3600)
+
+    def save_csv(self):
+        qs = WorldData.objects.order_by('-time').distinct()[:10]
+        listings = sorted(qs,key=lambda o:o.Mag)
+        listings.reverse()
+        dict_list = [{'Magnitude':list.Mag,'latitude':list.lat,
+        'longitude':list.lon,'country':list.country,'time':list.time} for list in listings]
+        df = pd.DataFrame(dict_list)
+        filestr = df.to_string()
+        # path = join(settings.MEDIA_ROOT, 'downloadable_csv', 'weekly_data.csv')
+        WeeklyCsvFile.objects.all().delete()
+        # with open(path,'w+') as f:
+        #     f.write(filestr)
+        weekly_data = WeeklyCsvFile()    
+        weekly_data.csv_file.save('weekly_data.csv',ContentFile(filestr)) 
+        weekly_data.save()
+
+    def name_country(self,lat,lon):
             geolocator = Nominatim(user_agent="my_app")
             location = geolocator.reverse(f'{lat},{lon}',language='en')
             #print(location)
@@ -28,50 +44,56 @@ class GetWeekly(CronJobBase):
             country = location.raw.get('address').get('country')
             return country
 
-        def create_data():
-            df = pd.read_csv('data.csv').dropna(
-                subset=['place']).sort_values(
-                    'mag',ascending=False).reset_index(
-                        drop=True).head(10)
-            obj_row = []
+    def create_data(self):
+        df = pd.read_csv('data/data.csv').dropna(
+            subset=['place']).sort_values(
+                'mag',ascending=False).reset_index(
+                    drop=True).head(10)
+        obj_row = []
 
-            for i in range(len(df)):
-                lat = df.iloc[i]['latitude']
-                lon = df.iloc[i]['longitude']
-                mag = df.iloc[i]['mag']
-                time = df.iloc[i]['time']
-                if country:=name_country(lat,lon):
-                    print(country)
-                    obj_row.append(WorldData(
-                        Mag=mag,
-                        lat=lat,
-                        lon=lon,
-                        country=country,
-                        time = time
-                    ))
-                else:
-                    print(df.iloc[i]['place'])
-                    obj_row.append(WorldData(
-                        Mag=mag,
-                        lat=lat,
-                        lon=lon,
-                        country=df.iloc[i]['place'],
-                        time = time
-                    ))
-            WorldData.objects.bulk_create(obj_row)
+        for i in range(len(df)):
+            lat = df.iloc[i]['latitude']
+            lon = df.iloc[i]['longitude']
+            mag = df.iloc[i]['mag']
+            time = df.iloc[i]['time']
+            if country:=self.name_country(lat,lon):
+                print(country)
+                obj_row.append(WorldData(
+                    Mag=mag,
+                    lat=lat,
+                    lon=lon,
+                    country=country,
+                    time = time
+                ))
+            else:
+                print(df.iloc[i]['place'])
+                obj_row.append(WorldData(
+                    Mag=mag,
+                    lat=lat,
+                    lon=lon,
+                    country=df.iloc[i]['place'],
+                    time = time
+                ))
+        WorldData.objects.bulk_create(obj_row)
 
-        # if self.hour_elapsed()>24:
-        end=datetime.now()
-        start = end-timedelta(days=7)
+    def do(self, *args, **options):
+        
+        
+        if self.hour_elapsed()>24:
+            end=datetime.now()
+            start = end-timedelta(days=7)
 
-        data = requests.get(f'https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime={start}&endtime={end}&minmagnitude=4.5')
-        #filepath = 'MapEarthQ/data.csv'
-        if data.status_code==200:
-            with open('data.csv', 'w') as writefile:
-                writefile.write(data.text)
-            create_data()
-        else:
-            print(data.status_code)
+            data = requests.get(f'https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime={start}&endtime={end}&minmagnitude=4.5')
+            #filepath = 'MapEarthQ/data.csv'
+            if data.status_code==200:
+                with open('data/data.csv', 'w') as writefile:
+                    writefile.write(data.text)
+                self.create_data()
+                self.save_csv()
+
+            else:
+                print(data.status_code)
+
 class DeleteOldWeekly(CronJobBase):
     schedule = Schedule(run_monthly_on_days=1)
     code = "cron.DeleteOldWeekly"

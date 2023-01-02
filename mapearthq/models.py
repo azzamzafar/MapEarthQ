@@ -22,4 +22,6 @@ class WorldData(models.Model):
         blank=True,
     )
 
+class WeeklyCsvFile(models.Model):
+    csv_file = models.FileField(upload_to='downloadable_csv')
    

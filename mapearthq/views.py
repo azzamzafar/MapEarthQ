@@ -1,17 +1,17 @@
 import folium
 from django.http import HttpResponse
 from django.shortcuts import render, HttpResponse
-from . import models
+from mapearthq.models import WorldData,WeeklyCsvFile
 # Create your views here.
 
 # listings = models.WorldData.objects.all()
 # print(listings[0].country)
 
 def index(request):
-    qs = models.WorldData.objects.order_by('-time').distinct()[:10]
+    qs = WorldData.objects.order_by('-time').distinct()[:10]
     listings = sorted(qs,key=lambda o:o.Mag)
     listings.reverse()
-   
+    weekly_data = WeeklyCsvFile.objects.last()
     m = folium.Map(location=[listings[0].lat,listings[0].lon],zoom_start=2)
     for listing in listings:
         if listing.Mag>=6:
@@ -24,5 +24,6 @@ def index(request):
        
 
     m=m._repr_html_()
-    context = {'listings': listings,'world_map':m,'iterator':[1,2,3,4,5,6,7,8,9,10]}
+    WeeklyCsvFile
+    context = {'listings': listings,'world_map':m,'csv_obj':weekly_data}
     return render(request,'index.html',context)
