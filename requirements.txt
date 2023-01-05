@@ -1,4 +1,6 @@
+dj-database-url==1.2.0
 Django==4.0
+django-configurations==2.4
 django-cron==0.6.0
 folium==0.14.0
 geopy==2.3.0
