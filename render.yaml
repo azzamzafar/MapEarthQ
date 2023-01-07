@@ -1,7 +1,7 @@
 services:
   - type: web
     name: MapEarthQ
-    env: python3
+    env: python 
     buildCommand: "./build.sh"
     startCommand: "gunicorn Project.wsgi:application"
     envVars:
