@@ -1,7 +1,7 @@
 # MapEarthQ
 *Live Earthquake monitor and visualiser written in Django.*
 
-<img src="https://github.com/azzamzafar/MapEarthQ/blob/main/MapEarthQ.gif"/>
+![preview](https://github.com/azzamzafar/MapEarthQ/blob/main/MapEarthQ.gif)
 
 __Features__
 
