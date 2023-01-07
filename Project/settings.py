@@ -22,11 +22,17 @@ class Dev(Configuration):
     # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = 'django-insecure-y*6$@qe7@3+y3sp0++)2l9dqva)h4@70=wb(zo09^&*as)^&n1'
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = values.BooleanValue(True)
+    # security.W016
+    CSRF_COOKIE_SECURE = True
 
+    # security.W012
+    SESSION_COOKIE_SECURE = True
+
+    
     ALLOWED_HOSTS = values.ListValue(['*'])
 
     # Application definition
@@ -44,6 +50,7 @@ class Dev(Configuration):
 
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
+        "whitenoise.middleware.WhiteNoiseMiddleware",
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,7 +81,7 @@ class Dev(Configuration):
 
 
     # Database:
-    DEBUG = False
+    DEBUG = True
     # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
     # DATABASES = {
@@ -132,10 +139,10 @@ class Dev(Configuration):
     # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
     STATIC_URL = 'static/'
-    STATIC_URL = "static/"
+    STATIC_ROOT = BASE_DIR/"static/"
     MEDIA_ROOT = BASE_DIR/"media"
     MEDIA_URL = "media/"
-
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -149,3 +156,5 @@ class Dev(Configuration):
 class Prod(Dev):
     DEBUG = False
     SECRET_KEY = values.SecretValue()
+    # security.W008
+    SECURE_SSL_REDIRECT = True

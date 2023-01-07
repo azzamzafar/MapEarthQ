@@ -123,5 +123,5 @@ class DeleteOldWeekly(CronJobBase):
             for query in querylist:
                 days_passed = (datetime.now(timezone.utc) - query.time).days
                 if days_passed >= 7:
-                    print(f"{query.country} deleted!")
+                    # print(f"{query.country} deleted!")
                     query.delete()
