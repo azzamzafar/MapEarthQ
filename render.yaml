@@ -5,11 +5,5 @@ services:
     buildCommand: "./build.sh"
     startCommand: "gunicorn Project.wsgi:application"
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: default
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
-      - key: WEB_CONCURRENCY
-        value: 4
