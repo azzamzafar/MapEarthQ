@@ -3,7 +3,7 @@ services:
     name: MapEarthQ
     env: python 
     buildCommand: "./build.sh"
-    startCommand: "gunicorn Project.wsgi:application"
+    startCommand: "python3 manage.py runcrons --force& gunicorn Project.wsgi:application"
     envVars:
       - key: SECRET_KEY
         generateValue: true

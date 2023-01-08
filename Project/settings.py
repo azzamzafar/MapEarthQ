@@ -142,6 +142,12 @@ class Dev(Configuration):
     STATIC_ROOT = BASE_DIR/"static/"
     MEDIA_ROOT = BASE_DIR/"media"
     MEDIA_URL = "media/"
+    # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ]
+
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -158,7 +164,7 @@ class Prod(Dev):
     SECRET_KEY = values.SecretValue()
     # security.W008
     SECURE_SSL_REDIRECT = True
-    ALLOWED_HOSTS = super().ALLOWED_HOSTS
+    ALLOWED_HOSTS = values.ListValue(['*'])
     RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
     if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
